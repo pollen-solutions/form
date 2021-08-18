@@ -1,0 +1,61 @@
+@use "sass:math";
+
+// Variables
+@import "../variables";
+
+// Customization
+@mixin form_field_checkbox {
+  .FieldCheckbox {
+    display: none;
+
+    + .FieldLabel {
+      position: relative;
+      font-size:$form-field-checkbox-label-font-size;
+      color: $form-field-checkbox-label-color;
+      display: flex;
+      align-items: center;
+      column-gap: 0.4em;
+      user-select: none;
+      cursor: pointer;
+
+      &::before {
+        display: block;
+        content: " ";
+        height: #{$form-field-checkbox-box-height}px;
+        width: #{$form-field-checkbox-box-width}px;
+      }
+
+      &::after {
+        display: block;
+        content: " ";
+        position: absolute;
+        top: 50%;
+        left: #{math.div($form-field-checkbox-box-width, 2) + $form-field-checkbox-box-border-width}px;
+        margin-top: -#{math.div($form-field-checkbox-box-checked-height, 2)}px;
+        margin-left: -#{math.div($form-field-checkbox-box-checked-width, 2)}px;
+        height: #{$form-field-checkbox-box-checked-height}px;
+        width: #{$form-field-checkbox-box-checked-width}px;
+        transform: scale(0);
+        transition: transform 200ms ease-in-out;
+      }
+    }
+
+    &[aria-invalid="true"] + .FieldLabel::before {
+      border: 1px solid $form-notice-error-border-color;
+    }
+
+    &:checked + .FieldLabel::after {
+      transform: scale(1);
+      transition: transform 200ms ease-in-out;
+    }
+
+    & + .FieldLabel::after {
+      background-color: $form-field-checkbox-box-checked-background-color;
+    }
+
+    & + .FieldLabel::before {
+      border: #{$form-field-checkbox-box-border-width}px solid $form-field-checkbox-box-border-color;
+      background-color: $form-field-checkbox-box-background-color;
+    }
+  }
+}

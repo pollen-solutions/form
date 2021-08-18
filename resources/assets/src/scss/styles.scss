@@ -1,0 +1,153 @@
+@use "sass:map";
+
+// Variables
+@import "variables";
+
+// Dependencies
+@import "clearfix";
+@import "gutters";
+@import "label";
+@import "notice";
+@import "required";
+@import "helpers";
+@import "fields/checkbox";
+@import "fields/checkbox-collection";
+@import "fields/datepicker";
+@import "fields/input-email";
+@import "fields/input-file";
+@import "fields/input-password";
+@import "fields/input-tel";
+@import "fields/input-text";
+@import "fields/radio";
+@import "fields/radio-collection";
+@import "fields/select";
+@import "fields/select-js";
+@import "fields/textarea";
+
+// Customization
+.Form {
+  /**
+   * Container
+   */
+  @if map.get($form-styles-enabled, helpers) {
+    @include helpers_width;
+    @include helpers_display;
+    @include helpers_text_align;
+  }
+
+  /**
+   * Float area
+   */
+  @if map.get($form-styles-enabled, clearfix) {
+    @include form_clearfix;
+  }
+
+  /**
+   * Gutters
+   */
+  @if map.get($form-styles-enabled, gutters) {
+    @include form_gutters;
+  }
+
+  /**
+   * Notifications
+   */
+  @if map.get($form-styles-enabled, notice) {
+    @include form_notice;
+  }
+
+  /**
+   * Labels
+   */
+  @if map.get($form-styles-enabled, label) {
+    @include form_label;
+  }
+
+  /**
+   * Required flag
+   */
+  @if map.get($form-styles-enabled, required) {
+    @include form_required;
+  }
+
+  /**
+   * Fields
+   */
+  @if map.get($form-styles-enabled, fields) {
+    // Checkbox
+    @if map.get($form-field_types-enabled, checkbox) {
+      @include form_field_checkbox;
+    }
+
+    // Checkbox collection
+    @if map.get($form-field_types-enabled, checkbox-collection) {
+      @include form_field_checkbox-collection;
+    }
+
+    // Datepicker
+    @if map.get($form-field_types-enabled, datepicker) {
+      @include form_field_datepicker;
+    }
+
+    // Email input
+    @if map.get($form-field_types-enabled, input-email) {
+      @include form_field_input-email;
+    }
+
+    // File input
+    @if map.get($form-field_types-enabled, input-file) {
+      @include form_field_input-file;
+    }
+
+    // Password input
+    @if map.get($form-field_types-enabled, input-password) {
+      @include form_field_input-password;
+    }
+
+    // Phone input
+    @if map.get($form-field_types-enabled, input-tel) {
+      @include form_field_input-tel;
+    }
+
+    // Text input
+    @if map.get($form-field_types-enabled, input-text) {
+      @include form_field_input-text;
+    }
+
+    // Radio button
+    @if map.get($form-field_types-enabled, radio) {
+      @include form_field-radio;
+    }
+
+    // Radio button collection
+    @if map.get($form-field_types-enabled, radio-collection) {
+      @include form_field_radio-collection;
+    }
+
+    // Select
+    @if map.get($form-field_types-enabled, select) {
+      @include form_field_select;
+    }
+
+    // Select JS
+    @if map.get($form-field_types-enabled, select-js) {
+      @include form_field_select-js;
+    }
+
+    // Textarea
+    @if map.get($form-field_types-enabled, textarea) {
+      @include form_field_textarea;
+    }
+  }
+
+  // @todo: Move in recaptcha component
+  .FieldRecaptcha {
+    &:focus {
+      outline: none;
+    }
+
+    &[aria-error=true] {
+      border-left: solid 3px $form-notice-error-border-color;
+    }
+  }
+}

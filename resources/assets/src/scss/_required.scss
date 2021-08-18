@@ -1,0 +1,9 @@
+// Variables
+@import "variables";
+
+// Customization
+@mixin form_required {
+  .FieldRequired {
+    color: $form-required-color;
+  }
+}
