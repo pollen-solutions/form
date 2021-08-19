@@ -10,10 +10,10 @@ use Pollen\Form\FormFieldDriver;
 class HtmlField extends FormFieldDriver implements HtmlFieldInterface
 {
     /**
-     * Liste des propriétés de formulaire supportées.
-     * @var array
+     * List of supported features.
+     * @var array|null
      */
-    protected $supports = [];
+    protected ?array $supports = [];
 
     /**
      * @inheritDoc

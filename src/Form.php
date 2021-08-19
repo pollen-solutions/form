@@ -122,7 +122,7 @@ class Form implements FormInterface
                 'groups',
                 'buttons',
                 'options',
-                'validate',
+                'validation',
             ];
 
             foreach ($services as $service) {
@@ -332,7 +332,7 @@ class Form implements FormInterface
              */
             'title'    => $this->getAlias(),
             /**
-             * CSRF token activation (recommended)
+             * CSRF token activation (recommended).
              * @var bool
              */
             'token'    => true,
@@ -378,7 +378,7 @@ class Form implements FormInterface
      */
     public function getAlias(): string
     {
-        return $this->alias;
+        return $this->alias ?: '';
     }
 
     /**
@@ -769,6 +769,8 @@ class Form implements FormInterface
             return $this->view;
         }
 
+        $this->formManager()->setCurrentForm($this);
+
         return $this->view->render($name, $data);
     }
 
@@ -859,8 +861,6 @@ class Form implements FormInterface
                 }
                 return '';
             });
-
-        //$this->formManager()->setCurrentForm($this);
 
         return $view;
     }

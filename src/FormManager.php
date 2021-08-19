@@ -17,6 +17,7 @@ use Pollen\Support\Proxy\ContainerProxy;
 use Pollen\Support\Proxy\EventProxy;
 use Psr\Container\ContainerInterface as Container;
 use RuntimeException;
+use Throwable;
 
 class FormManager implements FormManagerInterface
 {
@@ -188,17 +189,26 @@ class FormManager implements FormManagerInterface
             throw new RuntimeException('Unable to build the Form.');
         }
 
+        $params = [];
         if (is_array($definition)) {
             $alias = $definition['alias'] ?? null;
+
+            if ($alias !== null && !is_string($alias)) {
+                throw new RuntimeException('Form alias must be a string.');
+            }
+
             unset($definition['alias']);
             $params = $definition;
         } else {
             $alias = $form->getAlias();
-            $params = [];
         }
 
         if (empty($alias)) {
-            throw new RuntimeException('Form requires an alias to work.');
+            try {
+                $alias = $this->generateFormAlias($definition);
+            } catch(RuntimeException $e) {
+                throw new RuntimeException('Form requires an alias to work.', 0, $e);
+            }
         }
 
         if (!empty($this->forms[$alias])) {
@@ -212,6 +222,34 @@ class FormManager implements FormManagerInterface
         $this->forms[$alias]->setParams($params);
 
         return new FormBuilder($this->forms[$alias]->build());
+    }
+
+    /**
+     * Generate a form alias.
+     *
+     * @param string|array|FormInterface $formDefinition
+     *
+     * @return string
+     */
+    private function generateFormAlias($formDefinition): string
+    {
+        if (is_array($formDefinition)) {
+            try {
+                $baseAlias = json_encode($formDefinition, JSON_THROW_ON_ERROR);
+            } catch(Throwable $e) {
+                throw new RuntimeException('Unable to generate alias from the array form definition.');
+            }
+        } elseif (is_string($formDefinition)) {
+            $baseAlias = $formDefinition;
+        } elseif($formDefinition instanceof FormInterface) {
+            $baseAlias = get_class($formDefinition);
+        } else {
+            throw new RuntimeException('Unable to generate alias from the the form definition.');
+        }
+
+        $aliasSuffix = count($this->forms);
+
+        return sha1($baseAlias. '_' . $aliasSuffix);
     }
 
     /**
