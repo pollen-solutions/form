@@ -24,9 +24,18 @@ $forms = new FormManager();
 
 $form = $forms->buildForm(
     [
-        // alias (required)
+        /**
+         * Alias (Recommended)
+         * {@internal Alias is used for generate default HTML tag class, title. 
+         * By default an SHA-1 string is generated, it is not human readable.} 
+         * @var string
+         */
         'alias'  => 'auth',
-        // Form fields
+        /**
+         * Form fields
+         * @see Configuration/Field] below for more details
+         * @var array<string, array> 
+         */
         'fields' => [
             'login' => [
                 'type' => 'text',
@@ -46,7 +55,7 @@ if ($response = $form->handle()->proceed()) {
 echo $form; 
 ```
 
-### Instance definition
+### Form instance definition
 
 ```php
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
@@ -55,10 +64,7 @@ use Pollen\Form\FormManager;
 
 $forms = new FormManager();
 
-class AuthForm extends Form
-{
-    protected $alias = 'auth';
-
+$form = $forms->buildForm(new class extends Form {
     public function defaultParams(): array
     {
         return array_merge(parent::defaultParams(), [
@@ -72,9 +78,7 @@ class AuthForm extends Form
             ],
         ]);
     }
-}
-
-$form = $forms->buildForm(new AuthForm())->get();
+})->get();
 
 if ($response = $form->handle()->proceed()) {
     (new SapiEmitter())->emit($response->psr());
@@ -84,7 +88,7 @@ if ($response = $form->handle()->proceed()) {
 echo $form;
 ```
 
-### Dependency Injection definition
+### Dependency injection service definition
 
 ```php
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
@@ -98,8 +102,6 @@ $forms = new FormManager([], $container);
 
 class AuthForm extends Form
 {
-    protected $alias = 'auth';
-
     public function defaultParams(): array
     {
         return array_merge(parent::defaultParams(), [
@@ -134,63 +136,83 @@ echo $form;
 ```php
 [
     /**
-     * @var string $action Propriété 'action' de la balise <form/>.
+     * Action attribute in the form HTML tag.
+     * @var string $action
      */
     'action'   => '',
     /**
-     * @var array $addons Liste des attributs des addons actifs.
+     * List of enabled add-ons|List of enabled add-ons and their parameters.
+     * @var string[]|array<string, array> $addons
      */
     'addons'   => [],
     /**
-     * @var string $after Post-affichage, après la balise <form/>.
+     * HTML content displayed after the form close tag.
+     * @var string $after
      */
     'after'    => '',
     /**
-     * @var array $attrs Liste des attributs complémentaires de la balise <form/>.
+     * List of the HTML attributes for the form tag.
+     * @var array $attrs.
      */
     'attrs'    => [],
     /**
-     * @var string $before Pré-affichage, avant la balise <form/>.
+     * HTML content displayed before the form open tag.
+     * @var string $before
      */
     'before'   => '',
     /**
+     * List of enabled buttons|List of enabled buttons and their parameters.
      * @var array $buttons Liste des attributs des boutons actifs.
      */
     'buttons'  => [],
     /**
-     * @var string $enctype Propriété 'enctype' de la balise <form/>.
+     * Enctype attribute in the form HTML tag.
+     * @var string $enctype
      */
     'enctype'  => '',
     /**
-     * @var array $events Liste des événements de court-circuitage.
+     * List of observed and dispatched events.
+     * @var array $events
      */
     'events'   => [],
     /**
-     * @var array $fields Liste des attributs de champs.
+     * List of field parameters.
+     * @var array<string, array> $fields
      */
     'fields'   => [],
     /**
-     * @var string $method Propriété 'method' de la balise <form/>.
+     * HTTP request method of form submission.
+     * @var string $method
      */
     'method'   => 'post',
     /**
-     * @var array $options Liste des options du formulaire.
+     * List of option parameters.
+     * @var array $options
      */
     'options'  => [],
     /**
-     * @var string[] $supports Propriété de support.
+     * List of supported features.
+     * @var string[] $supports
      */
-    'supports' => [],
+    'supports' => ['session'],
     /**
-     * @var string $title Intitulé de qualification du formulaire.
+     * Form title.
+     * @var string $title
      */
-    'title'    => '',
+    'title'    => $this->getAlias(),
     /**
-     * @var array $view Attributs de configuration du gestionnaire de gabarits d'affichage.
+     * CSRF token activation (recommended).
+     * @var bool
+     */
+    'token'    => true,
+    /**
+     * List of parameters of the template view|View instance.
+     * @var array|ViewInterface $view
      */
     'view'   => [],
     /**
-     * @var array $wrapper Attributs de configuration de l'encapsulation du formulaire.
+     * List of HTML form wrapper parameters.
+     * @var array $wrapper
      */
     'wrapper'  => []
 ];
@@ -201,110 +223,149 @@ echo $form;
 ```php
 [
     /**
-     * @var string[]|array $addons Liste des attributs de configuration associés aux addons.
+     * List of addon parameters.
+     * @var array<string, array>|array $addons
      */
     'addons'      => [],
     /**
-     * @var string $after Contenu HTML affiché après le champ.
+     * HTML content displayed after the field.
+     * @var string $after
      */
     'after'       => '',
     /**
-     * @var array $attrs Liste des attributs de la balise HTML, hors name et value.
+     * List of the HTML tag attributes.
+     * @var array $attrs
      */
     'attrs'       => [],
     /**
-     * @var string $before Contenu HTML affiché avant le champ.
+     * HTML content displayed before the field.
+     * @var string $before
      */
     'before'      => '',
     /**
-     * @var array $choices Liste de choix des valeurs multiples.
+     * List of choices for field with multiple value.
+     * @var array $choices
      */
     'choices'     => [],
     /**
-     * @var array $extras Liste des attributs de configuration complémentaires.
+     * List of extra parameters.
+     * @var array $extras
      */
     'extras'      => [],
     /**
-     * @var string|null $group Alias du groupe d'appartenance.
+     * Alias of the related group.
+     * @var string|null $group
      */
     'group'       => null,
     /**
-     * @var bool|string|array $label Affichage de l'intitulé de champ. false si masqué|true charge les attributs
-     * par défaut|array permet de définir des attributs personnalisés.
+     * Field label.
+     * {@internal true for default|false to hide|array of custom parameters}.
+     * @var bool|string|array $label
      */
     'label'       => true,
     /**
+     * Name HTML tag attribute in the handle HTTP request.
      * @var string $name Indice de qualification de la variable de requête.
      */
     'name'        => $this->getSlug(),
     /**
-     * @var int $position Ordre d'affichage général ou dans le groupe s'il est défini.
+     * Display position.
+     * @var int $position
      */
     'position'    => 0,
     /**
+     * Required field parameters.
+     * ---------------------------------------------------------------------------------------------------------
+     * {@internal true for default parameters|false to disabling|array of custom parameters.
      * @var bool|string|array $required {
-     * Configuration de champs requis. false si désactivé|true charge les attributs par défaut|array
-     * @type bool|string|array $tagged Affichage de l'indicateur de champ requis. false si masqué|true charge
-     * les attributs par défaut|string valeur de l'indicateur|array permet de définir des attributs personnalisés.
-     * @type bool $check Activation du test d'existence natif.
-     * @type mixed $value_none Valeur à comparer pour le test d'existence.
-     * @type string|callable $call Fonction de validation|alias de qualification.
-     * @type array $args Liste des variables passées en argument dans la fonction de validation.
-     * @type string $message Message de notification de retour en cas d'erreur.
+     *
+     * HTML tag.
+     * {@internal true for default parameters|false to hide|array of custom parameters based.}
+     * @see \Pollen\Field\Drivers\RequiredDriver
+     * @var bool|string|array $tagged
+     *
+     * Enable required validation.
+     * @var bool $check
+     *
+     * Value of none value. empty string by default.
+     * @var mixed $value_none
+     *
+     * Validation function name|validation callable.
+     * @var string|callable $call
+     *
+     * List of arguments passed in the validation handle.
+     * @var array $args
+     *
+     * Notification message if validation failed.
+     * @type string $message
      * }
      */
     'required'    => false,
     /**
-     * @var array $supports Définition des propriétés de support. label|wrapper|request|tabindex|transport.
+     * List of supported features.
+     * @var array $supports label|wrapper|request|tabindex|transport.
      */
     'supports'    => [],
     /**
-     * @var string $title Intitulé de qualification. Valeur par défaut. ex. label.
+     * Title.
+     * @var string|null $title
      */
-    'title'       => $this->getSlug(),
+    'title'       => null,
     /**
-     * @var bool|null $transport Court-circuitage de la propriété de support du transport des données à
-     * l'issue de la soumission.
+     * Disable the persistent value in the submission HTTP response.
+     * {@internal if null, use the support feature value.}
+     * @var bool|null $transport
      */
     'transport'   => null,
     /**
-     * @var string $type Type de champ.
+     * Field type.
+     * @var string $type
      */
     'type'        => 'html',
     /**
-     * @var array $validations {
-     * Liste des fonctions de validation d'intégrité du champ lors de la soumission.
-     * @type string|callable $call Fonction de validation|alias de qualification.
-     * @type array $args Liste des variables passées en arguments dans la fonction de validation.
-     * @type string $message Message de notification d'erreur.
+     * List of validation tests.
+     * ---------------------------------------------------------------------------------------------------------
+     * @var string[]|array[][] $validations {
+     *
+     * Validation function name|validation callable.
+     * @var string|callable $call
+     *
+     * List of arguments passed in the validation handle.
+     * @var  array $args
+     *
+     * Notification message if validation failed.
+     * @type string $message
      * }
      */
     'validations' => [],
     /**
-     * @var mixed $value Valeur courante de la variable de requête.
+     * Current value.
+     * @var mixed $value
      */
-    'value'       => '',
+    'value'       => null,
     /**
-     * @var bool|string|array $wrapper Affichage de l'encapsuleur de champ.
-     * false si masqué|true charge les attributs par défaut|array permet de définir des attributs personnalisés.
+     * Field HTML Wrapper.
+     * {@internal true for default parameters|false for hide|array of custom parameters.}
+     * @var bool|string|array $wrapper
      */
-    'wrapper'     => null,
+    'wrapper'     => null
 ];
 
 ```
 
-## Stepwise decomposition
+## Stepwise process decomposition
 
 ```php
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Pollen\Form\FormManager;
+use Pollen\Form\Exception\FieldMissingException;
 use Pollen\Form\Exception\FieldValidateException;
 use Pollen\Http\Request;
 
-// Step 1 : Instantiate the Form Manager
+// Step 1 : Instantiate the Form Manager.
 $forms = new FormManager();
 
-// Step 2 : Register a Form
+// Step 2 : Register a Form.
 $forms->registerForm(
     'auth',
     [
@@ -325,26 +386,31 @@ $forms->registerForm(
 // Step 3 : Get and Boot the Form. After booting the form becomes immutable.
 $form = $forms->get('auth')->boot();
 
-// Step 4 : Form validation
+// Step 4 : Form validation.
 $request = Request::createFromGlobals();
 $form->setHandleRequest($request);
+$handle = $form->handle();
 
 if ($form->isSubmitted()) {
-    $fields = $form->formFields()->all();
-
     try {
-        $fields['login']->validate();
+        $field = $form->formField('login');
+        $field->validate($handle->datas('login'));
+    } catch (FieldMissingException $e) {
+        $form->error($e->getMessage());
     } catch (FieldValidateException $e) {
-        $fields['login']->error(__('Please enter a username.', 'theme'));
+        $form->error('Please enter a username.', ['field' => 'login']);
     }
 
     try {
-        $fields['pass']->validate();
+        $field = $form->formField('pass');
+        $field->validate($handle->datas('pass'));
+    } catch (FieldMissingException $e) {
+        $form->error($e->getMessage());
     } catch (FieldValidateException $e) {
         if ($e->isRequired()) {
-            $fields['pass']->error(__('Please enter a password.', 'theme'));
-        } elseif ($e->is('password')) {
-            $fields['pass']->error(__('Password format is invalid.', 'theme'));
+            $form->error('Please enter a password.', ['field' => 'pass']);
+        } elseif ($e->hasFlag('password')) {
+            $form->error('Password format is invalid.', ['field' => 'pass']);
         }
     }
 
@@ -353,22 +419,23 @@ if ($form->isSubmitted()) {
     } else {
         $form->handle()->success();
     }
-}
+       
+    /**
+     * Redirect response (optionnal but best pratice).
+     * {@internal Send form handle redirect response ensure that the form is always display through a GET HTTP method.
+     * All request data is then catched and dispatched by the session processor.}
+     */
+    $response = $form->handle()->redirectResponse();
 
-// Step 5 : Catching HTTP Response
-$response = $form->handle()->redirectResponse();
-
-// Step 6 : Form validated submission redirect
-if ($form->isSuccessful()) {
-    // ... Specific handling
-    (new SapiEmitter())->emit($response->psr());
+    if ($form->isSuccessful()) {
+        (new SapiEmitter())->emit($response->psr());
+    } else {
+        (new SapiEmitter())->emit($response->psr());
+    }
     exit;
+    /** End of redirect response */
 }
 
-// Step 6 :
-// Option # 1 : Form display after redirect (Best practice)
-(new SapiEmitter())->emit($response->psr());
-exit;
-// Option # 2 : Form output through the POST request (Web Standard practice)
+// Step 5 : Form render
 echo $form;
 ```

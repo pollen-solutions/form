@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pollen\Form;
 
 use Closure;
+use Pollen\Field\FieldDriverInterface;
 use Pollen\Form\Concerns\FormAwareTrait;
 use Pollen\Form\Exception\FieldValidateException;
 use Pollen\Support\Arr;
@@ -12,6 +13,7 @@ use Pollen\Support\Concerns\BootableTrait;
 use Pollen\Support\Concerns\BuildableTrait;
 use Pollen\Support\Concerns\ParamsBagAwareTrait;
 use Pollen\Support\Html;
+use Pollen\Support\Str;
 use Pollen\Support\MessagesBag;
 
 use RuntimeException;
@@ -62,6 +64,12 @@ class FormFieldDriver implements FormFieldDriverInterface
      * @var string|array|callable|null
      */
     protected $defaultValue;
+
+    /**
+     * Delegate field instance.
+     * @var FieldDriverInterface|null
+     */
+    protected ?FieldDriverInterface $delegateField = null;
 
     /**
      * Flag of existing error related to the field.
@@ -273,9 +281,9 @@ class FormFieldDriver implements FormFieldDriverInterface
             'supports'    => [],
             /**
              * Title.
-             * @var string $title
+             * @var string|null $title
              */
-            'title'       => $this->getSlug(),
+            'title'       => null,
             /**
              * Disable the persistent value in the submission HTTP response.
              * {@internal if null, use the support feature value.}
@@ -398,9 +406,7 @@ class FormFieldDriver implements FormFieldDriverInterface
     }
 
     /**
-     * Récupération de la liste des attibuts de support.
-     *
-     * @return array
+     * @inheritDoc
      */
     public function getSupports(): array
     {
@@ -412,7 +418,7 @@ class FormFieldDriver implements FormFieldDriverInterface
      */
     public function getTitle(): string
     {
-        return (string)$this->params('title');
+        return (string)($this->params('title') ?: $this->getSlug());
     }
 
     /**
@@ -513,7 +519,7 @@ class FormFieldDriver implements FormFieldDriverInterface
         }
 
         $name = $param->get('name');
-        if (!is_null($name)) {
+        if ($name !== null) {
             $param->set(['name' => Html::e($name ?: $this->getSlug())]);
         }
 
@@ -721,7 +727,7 @@ class FormFieldDriver implements FormFieldDriverInterface
 
             if ($label = $param->get('label')) {
                 if (is_string($label)) {
-                    $label = ['content' => $label];
+                    $label = ['content' => Str::humanWords($label)];
                 } elseif (is_bool($label)) {
                     $label = [];
                 }
@@ -764,7 +770,7 @@ class FormFieldDriver implements FormFieldDriverInterface
                 }
 
                 if (!$param->has('label.content')) {
-                    $param->set('label.content', $this->getTitle());
+                    $param->set('label.content', Str::humanWords($this->getTitle()));
                 }
 
                 if (!$param->get('label.content')) {
@@ -810,6 +816,7 @@ class FormFieldDriver implements FormFieldDriverInterface
             [
                 'name'  => $this->getName(),
                 'attrs' => $this->params('attrs', []),
+                'label' => false
             ]
         );
 
@@ -819,7 +826,9 @@ class FormFieldDriver implements FormFieldDriverInterface
 
         $args['value'] = $this->getValue();
 
-        return (string)$this->form()->field($this->getType(), $args);
+        $this->delegateField = $this->form()->field($this->getType(), $args);
+
+        return (string) $this->delegateField;
     }
 
     /**
@@ -916,7 +925,6 @@ class FormFieldDriver implements FormFieldDriverInterface
     {
         if ($value === null) {
             $value = $this->getValue();
-            //$value = $this->form()->handle()->datas($this->getName());
         }
 
         $check = true;
