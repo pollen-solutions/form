@@ -3,35 +3,35 @@
  * @var Pollen\Form\FormTemplateInterface $this
  */
 if ($errors = $this->get('notices.ERROR', [])) :
-    echo $this->partial('notice', [
+    echo $this->partial('tag', [
         'attrs'   => [
-           'class' => '%s FormNotice FormNotice--error'
+           'class' => 'FormNotice FormNotice--error'
         ],
-        'type'    => 'error',
+        'tag'    => 'div',
         'content' => $this->fetch('notices-error', ['messages' => $errors])
     ]);
 elseif (($success = $this->get('notices.SUCCESS', [])) || ($success = $this->get('notices.notice', []))) :
-    echo $this->partial('notice', [
+    echo $this->partial('tag', [
         'attrs'   => [
-            'class' => '%s FormNotice FormNotice--success'
+            'class' => 'FormNotice FormNotice--success'
         ],
-        'type'    => 'success',
+        'tag'    => 'div',
         'content' => $this->fetch('notices-success', ['messages' => $success])
     ]);
 elseif ($info = $this->get('notices.INFO', [])) :
-    echo $this->partial('notice', [
+    echo $this->partial('tag', [
         'attrs'   => [
-            'class' => '%s FormNotice FormNotice--info'
+            'class' => 'FormNotice FormNotice--info'
         ],
-        'type'    => 'info',
+        'tag'    => 'div',
         'content' => $this->fetch('notices-info', ['messages' => $info])
     ]);
 elseif ($warning = $this->get('notices.WARNING', [])) :
-    echo $this->partial('notice', [
+    echo $this->partial('tag', [
         'attrs'   => [
-            'class' => '%s FormNotice FormNotice--warning'
+            'class' => 'FormNotice FormNotice--warning'
         ],
-        'type'    => 'warning',
+        'tag'    => 'div',
         'content' => $this->fetch('notices-warning', ['messages' => $warning])
     ]);
 endif;
