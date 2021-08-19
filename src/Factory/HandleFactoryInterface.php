@@ -79,9 +79,9 @@ interface HandleFactoryInterface extends BootableTraitInterface, FormAwareTraitI
     /**
      * Handles the full process of form submission.
      *
-     * @return RedirectResponse
+     * @return RedirectResponse|null
      */
-    public function proceed(): RedirectResponse;
+    public function proceed(): ?RedirectResponse;
 
     /**
      * Retrieve the redirect response after the form submission.

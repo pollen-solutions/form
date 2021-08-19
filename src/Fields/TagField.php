@@ -9,10 +9,10 @@ use Pollen\Form\FormFieldDriver;
 class TagField extends FormFieldDriver implements TagFieldInterface
 {
     /**
-     * Liste des propriétés de formulaire supportées.
-     * @var array
+     * List of supported features.
+     * @var array|null
      */
-    protected $supports = ['wrapper'];
+    protected ?array $supports = ['wrapper'];
 
     /**
      * @inheritDoc
