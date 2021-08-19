@@ -158,7 +158,10 @@ class HandleFactory implements HandleFactoryInterface
      */
     protected function getRefererUrl(): string
     {
-        return $this->datas('_http_referer', $this->form()->getHandleRequest()->headers->get('referer'));
+        return $this->datas(
+            '_http_referer',
+            $this->form()->getHandleRequest()->headers->get('referer') ?: $this->form()->getHandleRequest()->getUrl()
+        );
     }
 
     /**
@@ -183,19 +186,18 @@ class HandleFactory implements HandleFactoryInterface
         $this->boot();
 
         if ($this->submitted === null) {
-            if (!$this->submitted = $this->form()->getHandleRequest()->isMethod($this->form()->getMethod())) {
-                //$this->form()->error('Form could not submitted : HTTP method is not allowed.');
-                $this->fail();
-            } elseif ($tokenValue = $this->tokenValue()) {
-                $this->submitted = $this->form()->session()->verifyToken($tokenValue);
+            $this->submitted = $this->form()->getHandleRequest()->isMethod($this->form()->getMethod());
+        }
 
-                if (!$this->submitted) {
-                    $this->form()->error('Form could not submitted : CSRF protection is invalid.');
-                    $this->fail();
-                }
-            } else {
-                $this->submitted = true;
+        if ($tokenValue = $this->tokenValue()) {
+            $this->submitted = $this->form()->session()->verifyToken($tokenValue);
+
+            if (!$this->submitted) {
+                $this->form()->error('Form could not submitted : CSRF protection is invalid.');
+                $this->fail();
             }
+        } else {
+            $this->submitted = false;
         }
 
         return $this->submitted;
@@ -228,7 +230,7 @@ class HandleFactory implements HandleFactoryInterface
     /**
      * @inheritDoc
      */
-    public function proceed(): RedirectResponse
+    public function proceed(): ?RedirectResponse
     {
         if ($this->isSubmitted()) {
             $this->validate();
@@ -238,9 +240,11 @@ class HandleFactory implements HandleFactoryInterface
             } else {
                 $this->fail();
             }
+
+            return $this->redirectResponse();
         }
 
-        return $this->redirectResponse();
+        return null;
     }
 
     /**

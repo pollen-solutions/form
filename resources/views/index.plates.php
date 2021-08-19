@@ -2,7 +2,6 @@
 /**
  * @var Pollen\Form\FormTemplateInterface $this
  */
-
 ?>
 <?php  if ($this->form()->params('wrapper')) : ?>
     <?php $this->layout('wrapper-form', $this->all()); ?>
