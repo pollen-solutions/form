@@ -2,6 +2,7 @@
 /**
  * @var Pollen\Form\FormTemplateInterface $this
  * @var string[] $messages
+ * @var Pollen\Form\FormInterface $form
  */
 ?>
 <?php if ($messages = $this->get('messages')) : ?>
