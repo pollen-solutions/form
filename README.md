@@ -65,6 +65,8 @@ use Pollen\Form\FormManager;
 $forms = new FormManager();
 
 $form = $forms->buildForm(new class extends Form {
+    protected ?string $alias = 'auth';
+
     public function defaultParams(): array
     {
         return array_merge(parent::defaultParams(), [
@@ -102,6 +104,15 @@ $forms = new FormManager([], $container);
 
 class AuthForm extends Form
 {
+    /**
+     * Alias identifier.
+     * @var string|null
+     */
+    protected ?string $alias = null;
+    
+    /**
+     * @inheritDoc
+     */
     public function defaultParams(): array
     {
         return array_merge(parent::defaultParams(), [

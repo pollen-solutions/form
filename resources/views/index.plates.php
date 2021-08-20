@@ -1,9 +1,10 @@
 <?php
 /**
  * @var Pollen\Form\FormTemplateInterface $this
+ * @var Pollen\Form\FormInterface $form
  */
 ?>
-<?php  if ($this->form()->params('wrapper')) : ?>
+<?php  if ($form->params('wrapper')) : ?>
     <?php $this->layout('wrapper-form', $this->all()); ?>
 <?php endif; ?>
 
@@ -11,7 +12,7 @@
 
 <?php $this->insert('notices', $this->all()); ?>
 
-    <form <?php echo $this->htmlAttrs($this->form()->params('attrs', [])); ?>>
+    <form <?php echo $this->htmlAttrs($form->params('attrs', [])); ?>>
         <?php echo $this->csrf(); ?>
 
         <?php if ($header = $this->fetch('header', $this->all())) : ?>

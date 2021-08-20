@@ -28,6 +28,7 @@ use Pollen\Support\Proxy\PartialProxy;
 use Pollen\Support\Proxy\ViewProxy;
 use Pollen\Translation\Concerns\LabelsBagAwareTrait;
 use Pollen\View\ViewInterface;
+use Pollen\ViewExtends\Extensions\FormViewExtension;
 use RuntimeException;
 
 class Form implements FormInterface
@@ -560,10 +561,11 @@ class Form implements FormInterface
                 MessagesBag::WARNING,
             ]
         );
+        $form = $this;
 
         return $this->view(
             $this->params('view.template_name') ?? 'index',
-            compact('buttons', 'fields', 'groups', 'notices')
+            compact('buttons', 'fields', 'form', 'groups', 'notices')
         );
     }
 
@@ -768,8 +770,6 @@ class Form implements FormInterface
         if (func_num_args() === 0) {
             return $this->view;
         }
-
-        $this->formManager()->setCurrentForm($this);
 
         return $this->view->render($name, $data);
     }
